@@ -14,16 +14,183 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      civic_reports: {
+        Row: {
+          actual_resolution_date: string | null
+          assigned_department: string | null
+          assigned_officer_id: string | null
+          category: Database["public"]["Enums"]["report_category"]
+          citizen_feedback: string | null
+          citizen_rating: number | null
+          created_at: string
+          description: string
+          estimated_resolution_date: string | null
+          id: string
+          image_urls: string[] | null
+          latitude: number | null
+          location_text: string
+          longitude: number | null
+          priority: Database["public"]["Enums"]["priority_level"]
+          report_number: string
+          status: Database["public"]["Enums"]["report_status"]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          actual_resolution_date?: string | null
+          assigned_department?: string | null
+          assigned_officer_id?: string | null
+          category: Database["public"]["Enums"]["report_category"]
+          citizen_feedback?: string | null
+          citizen_rating?: number | null
+          created_at?: string
+          description: string
+          estimated_resolution_date?: string | null
+          id?: string
+          image_urls?: string[] | null
+          latitude?: number | null
+          location_text: string
+          longitude?: number | null
+          priority?: Database["public"]["Enums"]["priority_level"]
+          report_number: string
+          status?: Database["public"]["Enums"]["report_status"]
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          actual_resolution_date?: string | null
+          assigned_department?: string | null
+          assigned_officer_id?: string | null
+          category?: Database["public"]["Enums"]["report_category"]
+          citizen_feedback?: string | null
+          citizen_rating?: number | null
+          created_at?: string
+          description?: string
+          estimated_resolution_date?: string | null
+          id?: string
+          image_urls?: string[] | null
+          latitude?: number | null
+          location_text?: string
+          longitude?: number | null
+          priority?: Database["public"]["Enums"]["priority_level"]
+          report_number?: string
+          status?: Database["public"]["Enums"]["report_status"]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          address: string | null
+          created_at: string
+          department: string | null
+          full_name: string | null
+          id: string
+          is_verified: boolean | null
+          phone_number: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          department?: string | null
+          full_name?: string | null
+          id?: string
+          is_verified?: boolean | null
+          phone_number?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          department?: string | null
+          full_name?: string | null
+          id?: string
+          is_verified?: boolean | null
+          phone_number?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      report_updates: {
+        Row: {
+          created_at: string
+          id: string
+          images: string[] | null
+          internal_notes: string | null
+          message: string
+          report_id: string
+          status: Database["public"]["Enums"]["report_status"]
+          updated_by: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          images?: string[] | null
+          internal_notes?: string | null
+          message: string
+          report_id: string
+          status: Database["public"]["Enums"]["report_status"]
+          updated_by: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          images?: string[] | null
+          internal_notes?: string | null
+          message?: string
+          report_id?: string
+          status?: Database["public"]["Enums"]["report_status"]
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_updates_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "civic_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_report_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
-      [_ in never]: never
+      priority_level: "low" | "medium" | "high" | "urgent"
+      report_category:
+        | "pothole"
+        | "streetlight"
+        | "water"
+        | "garbage"
+        | "drainage"
+        | "traffic"
+        | "park"
+        | "other"
+      report_status:
+        | "open"
+        | "acknowledged"
+        | "in-progress"
+        | "resolved"
+        | "closed"
+      user_role: "citizen" | "admin" | "department_head" | "field_officer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +317,26 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      priority_level: ["low", "medium", "high", "urgent"],
+      report_category: [
+        "pothole",
+        "streetlight",
+        "water",
+        "garbage",
+        "drainage",
+        "traffic",
+        "park",
+        "other",
+      ],
+      report_status: [
+        "open",
+        "acknowledged",
+        "in-progress",
+        "resolved",
+        "closed",
+      ],
+      user_role: ["citizen", "admin", "department_head", "field_officer"],
+    },
   },
 } as const
