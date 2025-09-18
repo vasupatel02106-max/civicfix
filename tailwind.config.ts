@@ -47,6 +47,12 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        civic: {
+          saffron: "hsl(var(--civic-saffron))",
+          green: "hsl(var(--civic-green))",
+          navy: "hsl(var(--civic-navy))",
+          orange: "hsl(var(--civic-orange))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -57,6 +63,15 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+      },
+      backgroundImage: {
+        "gradient-civic": "var(--gradient-civic)",
+        "gradient-government": "var(--gradient-government)",
+        "gradient-success": "var(--gradient-success)",
+      },
+      boxShadow: {
+        "civic": "var(--shadow-civic)",
+        "government": "var(--shadow-government)",
       },
       borderRadius: {
         lg: "var(--radius)",
