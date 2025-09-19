@@ -133,11 +133,11 @@ const Chat = () => {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Chat */}
           <div className="lg:col-span-3">
-            <Card className="h-[70vh] lg:h-[600px] flex flex-col">
+            <Card className="h-96 lg:h-[600px] flex flex-col">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <MessageSquare className="h-5 w-5 text-civic-saffron" />
@@ -204,17 +204,17 @@ const Chat = () => {
                 {/* Quick Suggestions */}
                 <div className="mb-4">
                   <p className="text-sm text-muted-foreground mb-2">Quick suggestions:</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {quickSuggestions.map((suggestion, index) => (
                       <Button
                         key={index}
                         variant="outline"
                         size="sm"
                         onClick={() => handleSuggestionClick(suggestion.text)}
-                        className="text-xs justify-start h-auto py-2 px-3"
+                        className="text-xs"
                       >
-                        <suggestion.icon className="h-3 w-3 mr-2 flex-shrink-0" />
-                        <span className="truncate">{suggestion.text}</span>
+                        <suggestion.icon className="h-3 w-3 mr-1" />
+                        {suggestion.text}
                       </Button>
                     ))}
                   </div>
@@ -245,8 +245,8 @@ const Chat = () => {
             </Card>
           </div>
 
-          {/* Sidebar - Hidden on mobile */}
-          <div className="hidden lg:block space-y-6">
+          {/* Sidebar */}
+          <div className="space-y-6">
             {/* Department Contacts */}
             <Card>
               <CardHeader>
@@ -259,9 +259,7 @@ const Chat = () => {
                 {departmentContacts.map((dept, index) => (
                   <div key={index} className="border-b last:border-b-0 pb-3 last:pb-0">
                     <h4 className="font-medium text-sm">{dept.name}</h4>
-                    <a href={`tel:${dept.phone}`} className="text-sm text-civic-navy font-mono hover:underline">
-                      {dept.phone}
-                    </a>
+                    <p className="text-sm text-civic-navy font-mono">{dept.phone}</p>
                     <div className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Clock className="h-3 w-3" />
                       <span>{dept.timings}</span>
@@ -277,15 +275,15 @@ const Chat = () => {
                 <CardTitle className="text-lg">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button variant="outline" className="w-full justify-start" size="sm" onClick={() => window.location.href = "/report"}>
+                <Button variant="outline" className="w-full justify-start" size="sm">
                   <FileText className="h-4 w-4 mr-2" />
                   Report New Issue
                 </Button>
-                <Button variant="outline" className="w-full justify-start" size="sm" onClick={() => window.location.href = "/map"}>
+                <Button variant="outline" className="w-full justify-start" size="sm">
                   <MapPin className="h-4 w-4 mr-2" />
                   View Issue Map
                 </Button>
-                <Button variant="outline" className="w-full justify-start" size="sm" onClick={() => window.location.href = "/track"}>
+                <Button variant="outline" className="w-full justify-start" size="sm">
                   <HelpCircle className="h-4 w-4 mr-2" />
                   Track My Reports
                 </Button>
@@ -304,32 +302,6 @@ const Chat = () => {
                   <li>• Mention if it's a safety hazard</li>
                   <li>• Keep your reference number handy</li>
                 </ul>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Mobile Department Contacts */}
-          <div className="lg:hidden">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Phone className="h-5 w-5" />
-                  Emergency Contacts
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {departmentContacts.slice(0, 4).map((dept, index) => (
-                    <a 
-                      key={index} 
-                      href={`tel:${dept.phone}`}
-                      className="block p-3 border rounded-lg hover:bg-muted transition-colors"
-                    >
-                      <h4 className="font-medium text-sm">{dept.name}</h4>
-                      <p className="text-sm text-civic-navy font-mono">{dept.phone}</p>
-                    </a>
-                  ))}
-                </div>
               </CardContent>
             </Card>
           </div>

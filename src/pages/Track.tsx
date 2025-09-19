@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,106 +13,68 @@ import {
   Eye,
   Calendar,
   MapPin,
-  Star,
-  Send
+  Star
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
 
 const Track = () => {
   const [searchId, setSearchId] = useState("");
-  const [userIssues, setUserIssues] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!user) {
-      toast({
-        title: "Please sign in",
-        description: "You need to be signed in to track issues.",
-        variant: "destructive",
-      });
-      navigate("/auth");
-      return;
+  // Mock data for user's reported issues
+  const userIssues = [
+    {
+      id: "CF001",
+      title: "Pothole on MG Road",
+      status: "in-progress",
+      progress: 75,
+      category: "pothole",
+      reportedDate: "2024-01-15",
+      lastUpdate: "2024-01-18",
+      location: "MG Road, Near City Mall",
+      updates: [
+        { date: "2024-01-15", status: "reported", message: "Issue reported and reference number generated" },
+        { date: "2024-01-16", status: "acknowledged", message: "Issue acknowledged by Road Department" },
+        { date: "2024-01-17", status: "in-progress", message: "Repair work started" },
+        { date: "2024-01-18", status: "update", message: "50% work completed, expected completion by Jan 20" }
+      ],
+      rating: null
+    },
+    {
+      id: "CF002", 
+      title: "Street Light Not Working",
+      status: "resolved",
+      progress: 100,
+      category: "streetlight", 
+      reportedDate: "2024-01-12",
+      lastUpdate: "2024-01-14",
+      location: "Vijay Nagar, Sector 2",
+      updates: [
+        { date: "2024-01-12", status: "reported", message: "Issue reported successfully" },
+        { date: "2024-01-13", status: "acknowledged", message: "Electrical Department assigned technician" },
+        { date: "2024-01-14", status: "resolved", message: "Street light repaired and functioning" }
+      ],
+      rating: 4
+    },
+    {
+      id: "CF003",
+      title: "Garbage Collection Delayed",
+      status: "open",
+      progress: 25,
+      category: "garbage",
+      reportedDate: "2024-01-20",
+      lastUpdate: "2024-01-20",
+      location: "New Market Area", 
+      updates: [
+        { date: "2024-01-20", status: "reported", message: "Issue reported to Sanitation Department" }
+      ],
+      rating: null
     }
-    fetchUserReports();
-  }, [user, navigate]);
-
-  const fetchUserReports = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('civic_reports')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      setUserIssues(data || []);
-    } catch (error: any) {
-      console.error('Error fetching reports:', error);
-      toast({
-        title: "Error loading reports",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const searchIssue = async () => {
-    if (!searchId.trim()) return;
-    
-    try {
-      const { data, error } = await supabase
-        .from('civic_reports')
-        .select('*')
-        .eq('report_number', searchId.trim())
-        .single();
-
-      if (error) {
-        toast({
-          title: "Issue not found",
-          description: "No issue found with that reference number.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // If found and belongs to user, highlight it
-      if (data.user_id === user?.id) {
-        toast({
-          title: "Issue found",
-          description: `Found your issue: ${data.title}`,
-        });
-      } else {
-        toast({
-          title: "Issue found",
-          description: `Issue found but you don't have permission to view details.`,
-        });
-      }
-    } catch (error: any) {
-      console.error('Error searching:', error);
-      toast({
-        title: "Search error",
-        description: "Unable to search at this time.",
-        variant: "destructive",
-      });
-    }
-  };
+  ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "open": return "destructive";
       case "acknowledged": return "secondary";
-      case "in_progress": return "secondary";
+      case "in-progress": return "secondary";
       case "resolved": return "civic";
       default: return "outline";
     }
@@ -136,27 +98,6 @@ const Track = () => {
       </div>
     );
   };
-
-  const getProgress = (status: string) => {
-    switch (status) {
-      case "open": return 25;
-      case "acknowledged": return 50;
-      case "in_progress": return 75;
-      case "resolved": return 100;
-      default: return 0;
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-civic-saffron mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading your reports...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -185,13 +126,12 @@ const Track = () => {
           <CardContent>
             <div className="flex gap-4">
               <Input
-                placeholder="Enter issue ID (e.g., CF240001)"
+                placeholder="Enter issue ID (e.g., CF001)"
                 value={searchId}
                 onChange={(e) => setSearchId(e.target.value)}
                 className="flex-1"
-                onKeyPress={(e) => e.key === 'Enter' && searchIssue()}
               />
-              <Button variant="civic" onClick={searchIssue}>
+              <Button variant="civic">
                 <Search className="h-4 w-4 mr-2" />
                 Search
               </Button>
@@ -215,7 +155,7 @@ const Track = () => {
               <div>
                 <p className="text-sm font-medium text-muted-foreground">In Progress</p>
                 <p className="text-2xl font-bold text-secondary">
-                  {userIssues.filter(i => i.status === "in_progress" || i.status === "acknowledged").length}
+                  {userIssues.filter(i => i.status === "in-progress").length}
                 </p>
               </div>
               <Clock className="h-8 w-8 text-secondary" />
@@ -238,101 +178,99 @@ const Track = () => {
         <div className="space-y-6">
           <h2 className="text-xl font-semibold text-foreground">Your Reported Issues</h2>
           
-          {userIssues.length === 0 ? (
-            <Card>
-              <CardContent className="text-center py-8">
-                <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-foreground mb-2">No reports yet</h3>
-                <p className="text-muted-foreground mb-4">You haven't reported any issues yet.</p>
-                <Button variant="civic" onClick={() => navigate("/report")}>
-                  <Send className="h-4 w-4 mr-2" />
-                  Report Your First Issue
-                </Button>
+          {userIssues.map((issue) => (
+            <Card key={issue.id} className="overflow-hidden">
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle className="text-lg">{issue.title}</CardTitle>
+                    <CardDescription className="flex items-center gap-2 mt-2">
+                      <span>ID: {issue.id}</span>
+                      <span>•</span>
+                      <MapPin className="h-4 w-4" />
+                      <span>{issue.location}</span>
+                    </CardDescription>
+                  </div>
+                  <Badge variant={getStatusColor(issue.status) as any}>
+                    {issue.status.replace("-", " ").toUpperCase()}
+                  </Badge>
+                </div>
+              </CardHeader>
+              
+              <CardContent>
+                {/* Progress Bar */}
+                <div className="mb-6">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium">Progress</span>
+                    <span className="text-sm text-muted-foreground">{issue.progress}%</span>
+                  </div>
+                  <Progress value={issue.progress} className="h-2" />
+                </div>
+
+                {/* Timeline */}
+                <div className="mb-6">
+                  <h4 className="font-medium mb-4 flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    Status Timeline
+                  </h4>
+                  <div className="space-y-3">
+                    {issue.updates.map((update, index) => (
+                      <div key={index} className="flex gap-3">
+                        <div className="flex flex-col items-center">
+                          <div className={`w-3 h-3 rounded-full ${
+                            update.status === "resolved" ? "bg-civic-green" :
+                            update.status === "in-progress" ? "bg-secondary" :
+                            update.status === "acknowledged" ? "bg-civic-saffron" :
+                            "bg-muted-foreground"
+                          }`} />
+                          {index < issue.updates.length - 1 && (
+                            <div className="w-0.5 h-8 bg-muted mt-2" />
+                          )}
+                        </div>
+                        <div className="flex-1 pb-4">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-sm font-medium capitalize">
+                              {update.status.replace("-", " ")}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(update.date).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{update.message}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex flex-wrap gap-3 pt-4 border-t">
+                  <Button variant="outline" size="sm">
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Details
+                  </Button>
+                  <Button variant="ghost" size="sm">
+                    <MapPin className="h-4 w-4 mr-2" />
+                    View on Map
+                  </Button>
+                  
+                  {issue.status === "resolved" && !issue.rating && (
+                    <Button variant="civic" size="sm">
+                      <Star className="h-4 w-4 mr-2" />
+                      Rate Resolution
+                    </Button>
+                  )}
+                  
+                  {issue.rating && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">Your rating:</span>
+                      {renderStars(issue.rating)}
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
-          ) : (
-            userIssues.map((issue) => (
-              <Card key={issue.id} className="overflow-hidden">
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-lg">{issue.title}</CardTitle>
-                      <CardDescription className="flex items-center gap-2 mt-2">
-                        <span>ID: {issue.report_number}</span>
-                        <span>•</span>
-                        <MapPin className="h-4 w-4" />
-                        <span>{issue.location_text}</span>
-                      </CardDescription>
-                    </div>
-                    <Badge variant={getStatusColor(issue.status) as any}>
-                      {issue.status.replace("_", " ").toUpperCase()}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                
-                <CardContent>
-                  {/* Progress Bar */}
-                  <div className="mb-6">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium">Progress</span>
-                      <span className="text-sm text-muted-foreground">{getProgress(issue.status)}%</span>
-                    </div>
-                    <Progress value={getProgress(issue.status)} className="h-2" />
-                  </div>
-
-                  {/* Issue Details */}
-                  <div className="mb-6 space-y-2">
-                    <div className="text-sm">
-                      <span className="font-medium text-foreground">Category:</span>
-                      <span className="ml-2 capitalize">{issue.category}</span>
-                    </div>
-                    <div className="text-sm">
-                      <span className="font-medium text-foreground">Priority:</span>
-                      <Badge variant={issue.priority === 'high' ? 'destructive' : 'secondary'} className="ml-2 text-xs">
-                        {issue.priority.toUpperCase()}
-                      </Badge>
-                    </div>
-                    <div className="text-sm">
-                      <span className="font-medium text-foreground">Reported:</span>
-                      <span className="ml-2">{new Date(issue.created_at).toLocaleDateString()}</span>
-                    </div>
-                    {issue.description && (
-                      <div className="text-sm">
-                        <span className="font-medium text-foreground">Description:</span>
-                        <p className="mt-1 text-muted-foreground">{issue.description}</p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex flex-wrap gap-3 pt-4 border-t">
-                    <Button variant="outline" size="sm">
-                      <Eye className="h-4 w-4 mr-2" />
-                      View Details
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <MapPin className="h-4 w-4 mr-2" />
-                      View on Map
-                    </Button>
-                    
-                    {issue.status === "resolved" && !issue.citizen_rating && (
-                      <Button variant="civic" size="sm">
-                        <Star className="h-4 w-4 mr-2" />
-                        Rate Resolution
-                      </Button>
-                    )}
-                    
-                    {issue.citizen_rating && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">Your rating:</span>
-                        {renderStars(issue.citizen_rating)}
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
+          ))}
         </div>
 
         {/* Help Section */}
@@ -349,7 +287,7 @@ const Track = () => {
                 <Button variant="outline" size="sm">
                   Contact Support
                 </Button>
-                <Button variant="civic" size="sm" onClick={() => navigate("/chat")}>
+                <Button variant="civic" size="sm">
                   Ask AI Assistant
                 </Button>
               </div>
